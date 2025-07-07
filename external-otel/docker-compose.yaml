@@ -1,0 +1,19 @@
+version: "3"
+services:
+  otel-collector:
+    image: signoz/signoz-otel-collector:v0.111.38
+    container_name: signoz-otel-collector
+    command:
+      - --config=/etc/otel-collector-config.yaml
+      - --copy-path=/var/tmp/collector-config.yaml
+      - --feature-gates=-pkg.translator.prometheus.NormalizeName
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=host.name=signoz-host,os.type=linux
+      - LOW_CARDINAL_EXCEPTION_GROUPING=false
+      - CLICKHOUSE_HOST=PREENCHA_ME
+      - ALLOWED_ORIGINS=PREENCHA_ME
