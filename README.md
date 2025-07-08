@@ -10,7 +10,7 @@ Este repositório contém a estrutura necessária para executar:
 Essa separação permite mais flexibilidade, isolamento por ambiente ou aplicação, e facilita o escalonamento horizontal da coleta de dados.
 
 > Para uso em ambiente de **desenvolvimento**, apenas o SigNoz precisa ser executado.  
-> O collector externo é opcional e recomendado apenas em ambientes distribuídos ou mais complexos.
+> O collector externo é opcional e recomendado apenas em ambientes distribuídos ou mais complexos. 
 
 ## Pré-requisitos
 Antes de começar, certifique-se de que você tem os seguintes requisitos instalados:
