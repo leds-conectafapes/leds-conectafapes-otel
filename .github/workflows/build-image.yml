@@ -41,4 +41,5 @@ jobs:
       # O chart do PRODEST referencia a imagem por digest, entao e ele que vai
       # para o values-hom.yaml.
       - name: Digest
-        run: echo "Digest publicado: ${{ steps.build.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          echo "Digest publicado: ${{ steps.build.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"
