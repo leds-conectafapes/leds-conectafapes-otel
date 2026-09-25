@@ -15,5 +15,8 @@ services:
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name=signoz-host,os.type=linux
       - LOW_CARDINAL_EXCEPTION_GROUPING=false
-      - CLICKHOUSE_HOST=PREENCHA_ME
+      - OTLP_ENDPOINT=PREENCHA_ME
+      - OTLP_INSECURE=true
+      - K8S_CLUSTER_NAME=local
+      - K8S_NAMESPACE_NAME=local
       - ALLOWED_ORIGINS=PREENCHA_ME

@@ -56,7 +56,9 @@ Esse serviço escuta nas portas:
 
 Você pode configurar as seguintes variáveis no `docker-compose.yaml`:
 
-* `CLICKHOUSE_HOST`: endereço IP ou hostname do ClickHouse (ex: `10.128.128.18`)
+* `OTLP_ENDPOINT`: `host:porta` do receiver OTLP gRPC do SigNoz de destino (ex: `localhost:4317`)
+* `OTLP_INSECURE`: `true` para falar sem TLS, como com o SigNoz local; `false` com TLS
+* `K8S_CLUSTER_NAME` e `K8S_NAMESPACE_NAME`: carimbados em todo sinal. Os dashboards do SigNoz filtram por esses rótulos, e serviço sem eles some dos painéis
 * `ALLOWED_ORIGINS`: origem permitida para CORS (ex: `http://localhost:5173`)
 
 ---
