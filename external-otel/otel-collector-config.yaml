@@ -1,3 +1,13 @@
+# Coletor que roda junto da aplicacao e repassa tudo por OTLP para um SigNoz.
+#
+# Variaveis obrigatorias:
+#   OTLP_ENDPOINT       host:porta do receiver OTLP gRPC do SigNoz de destino
+#   OTLP_INSECURE       "true" sem TLS (SigNoz local), "false" com TLS
+#   K8S_CLUSTER_NAME    carimbado em todo sinal. Os dashboards do SigNoz filtram
+#                       e agrupam por esse rotulo, e onde o k8s-infra nao roda
+#                       ninguem mais carimba: servico sem ele some dos paineis
+#   K8S_NAMESPACE_NAME  idem, para os paineis que agrupam por namespace
+#   ALLOWED_ORIGINS     origem permitida no CORS do receiver HTTP
 receivers:
   otlp:
     protocols:
@@ -12,30 +22,40 @@ receivers:
             - "*"
 
 processors:
+  # Com o destino fora do ar ou recusando, a fila de reenvio do exporter cresce
+  # em memoria. O limite segura o pod antes do OOMKilled.
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 80
+    spike_limit_percentage: 20
+  resource:
+    attributes:
+      - key: k8s.cluster.name
+        value: "${env:K8S_CLUSTER_NAME}"
+        action: upsert
+      - key: k8s.namespace.name
+        value: "${env:K8S_NAMESPACE_NAME}"
+        action: insert
   batch:
     timeout: 10s
 
 exporters:
-  clickhousetraces:
-    datasource: tcp://${env:CLICKHOUSE_HOST}:9000/signoz_traces
-    use_new_schema: true
-  clickhousemetricswrite:
-    endpoint: tcp://${env:CLICKHOUSE_HOST}:9000/signoz_metrics
-  clickhouselogsexporter:
-    dsn: tcp://${env:CLICKHOUSE_HOST}:9000/signoz_logs
-    use_new_schema: true
+  otlp:
+    endpoint: "${env:OTLP_ENDPOINT}"
+    tls:
+      insecure: ${env:OTLP_INSECURE}
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [clickhousetraces]
+      processors: [memory_limiter, resource, batch]
+      exporters: [otlp]
     metrics:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [clickhousemetricswrite]
+      processors: [memory_limiter, resource, batch]
+      exporters: [otlp]
     logs:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [clickhouselogsexporter]
+      processors: [memory_limiter, resource, batch]
+      exporters: [otlp]
